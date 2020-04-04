@@ -1,6 +1,7 @@
 import glob
 import os.path
 import re
+import datetime
 
 path = 'D:/Documents/Winamax Poker/accounts/ArcLight__4/history'
 
@@ -36,13 +37,17 @@ def listdirectory(path):
                 buyinraw = re.search('Buy-In : (\d+\.?\d*)€ \+ (\d+\.?\d*)€', raw)
                 buyin = (float(buyinraw.group(1)), float(buyinraw.group(2)))
 
+                dateraw = re.search('Tournament started ([\d]{4})\/([\d]{2})\/([\d]{2}) ([\d]{2})\:([\d]{2})\:([\d]{2}) (\S+)', raw)
+                date = datetime.datetime(int(dateraw.group(1)), int(dateraw.group(2)), int(dateraw.group(3)), 
+                int(dateraw.group(4)), int(dateraw.group(5)), int(dateraw.group(6)))
+
                 if re.search('You won (\d+\.?\d*)€', raw):
                     gain = (float(re.search('You won (\d+\.?\d*)€', raw).group(1)))
                 else:
                     gain = (0)
 
                 a.close()
-                games.append((variante, position, nbjoueur, vitesse, mode, prizepool, gain, buyin))
+                games.append((variante, position, nbjoueur, vitesse, mode, prizepool, date, gain, buyin))
 
     return games
 
