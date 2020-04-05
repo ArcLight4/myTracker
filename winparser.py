@@ -1,6 +1,7 @@
 import glob
 import os.path
 import re
+import datetime
 
 def listdirectory(path):
     files = glob.glob(path + '/*')
@@ -27,12 +28,19 @@ def listdirectory(path):
 
                 vitesse = re.search('Speed : (\S+)', raw).group(1)
 
-                mode = re.search('Mode : (\S+)', raw).group(1)
+                #mode = re.search('Mode : (\S+)', raw).group(1)
 
                 prizepool = float(re.search('Prizepool : (\d+\.?\d*)€', raw).group(1))
 
                 buyinraw = re.search('Buy-In : (\d+\.?\d*)€ \+ (\d+\.?\d*)€', raw)
                 buyin = (float(buyinraw.group(1)), float(buyinraw.group(2)))
+
+                mode = re.search('Type : (\S+)', raw).group(1)
+
+                dateraw = re.search(
+                    'Tournament started ([\d]{4})\/([\d]{2})\/([\d]{2}) ([\d]{2})\:([\d]{2})\:([\d]{2}) (\S+)', raw)
+                date = datetime.datetime(int(dateraw.group(1)), int(dateraw.group(2)), int(dateraw.group(3)),
+                                         int(dateraw.group(4)), int(dateraw.group(5)), int(dateraw.group(6)))
 
                 if re.search('You won (\d+\.?\d*)€', raw):
                     gain = (float(re.search('You won (\d+\.?\d*)€', raw).group(1)))
@@ -40,6 +48,6 @@ def listdirectory(path):
                     gain = (0)
 
                 a.close()
-                games.append((variante, position, nbjoueur, vitesse, mode, prizepool, gain, buyin))
+                games.append((variante, position, nbjoueur, vitesse, mode, prizepool, date, gain, buyin,type))
 
     return games

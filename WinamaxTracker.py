@@ -3,9 +3,10 @@ from tkinter import filedialog
 from tkinter import *
 from tkinter.ttk import *
 from tkcalendar import *
-from datetime import date
+import datetime
 import winparser,winlist
 import shelve
+
 
 # setup
 window = Tk()
@@ -30,23 +31,31 @@ frame = [Frame(window), Frame(window), Frame(window), Frame(window), Frame(windo
          Frame(window)]
 
 # variable
-data_nbjoueur = winlist.doublon(winparser.listdirectory(path),2)
-data_speed = winlist.doublon(winparser.listdirectory(path),3)
-data_typemdj = winlist.doublon(winparser.listdirectory(path),4)
-txt_var_variante = winlist.doublon(winparser.listdirectory(path),0)
+list_game=winparser.listdirectory(path)
+txt_speed=winlist.doublon(list_game,3)
+txt_mdj=winlist.doublon(list_game,4)
+data_nbjoueur = winlist.doublon(list_game,2)
+data_speed = winlist.word_convert(txt_speed)
+data_typemdj = winlist.word_convert(txt_mdj)
+txt_var_variante = winlist.doublon(list_game,0)
 var_variante = [IntVar(), IntVar(), IntVar()]
 var_speed = []
 resultatmdj = StringVar()
-resultatmdj.set(1)
+resultatmdj.set(txt_mdj[0])
 element2, element3 = [], []
 
 def action_button():
-    nbjoueur, mdj, speed, variante = cb_nbjoueur.get(), [], [], []
+    nbjoueur, mdj, speed, variante = int(cb_nbjoueur.get()), [], [], []
     periode = [debut.get_date(), fin.get_date()]
-    for k in range(len(txt_var_variante)): variante.append(var_variante[k].get())
+    for k in range(len(txt_var_variante)):
+        if var_variante[k].get() == 1 :
+            variante.append(txt_var_variante[k])
     mdj = resultatmdj.get()
-    for k in range(len(var_speed)): speed.append(var_speed[k].get())
-    print(variante, nbjoueur, mdj, speed, periode)
+    for k in range(len(var_speed)):
+        if var_speed[k].get() == 1 :
+            speed.append(txt_speed[k])
+    var_input = [variante, nbjoueur, mdj, speed, periode]
+    winlist.graph(winlist.data(list_game,var_input),periode,mdj)
 
 def aff_frame(n):
     if 0 < n < (len(frame) - 1):
@@ -82,7 +91,7 @@ aff_frame(n)
 
 n += 1
 for k in range(len(data_typemdj)):
-    element = Radiobutton(frame[n], text=data_typemdj[k], variable=resultatmdj, value=k + 1)
+    element = Radiobutton(frame[n], text=data_typemdj[k], variable=resultatmdj, value=txt_mdj[k])
     element.grid(row=k // 2, column=k % 2, padx=4, pady=4)
 frame[n].pack()
 
@@ -106,13 +115,13 @@ aff_frame(n)
 n += 1
 label_deb = Label(frame[n], text='Début : ')
 label_deb.grid(row=0, column=0, pady=8)
-debut = DateEntry(frame[n], date_pattern='dd/mm/y', state="readonly", year=date.today().year,
-                  month=date.today().month - 1, day=date.today().day)
+debut = DateEntry(frame[n], date_pattern='dd/mm/y', state="readonly", year=datetime.date.today().year,
+                  month=datetime.date.today().month - 1, day=datetime.date.today().day)
 debut.grid(row=0, column=1, pady=8)
 label_fin = Label(frame[n], text='Fin : ')
 label_fin.grid(row=1, column=0)
-fin = DateEntry(frame[n], date_pattern='dd/mm/y', state="readonly", year=date.today().year, month=date.today().month,
-                day=date.today().day)
+fin = DateEntry(frame[n], date_pattern='dd/mm/y', state="readonly", year=datetime.date.today().year, month=datetime.date.today().month,
+                day=datetime.date.today().day)
 fin.grid(row=1, column=1)
 frame[n].pack()
 
